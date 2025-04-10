@@ -206,9 +206,9 @@ export const users: User[] = [
   },
   {
     id: "student23",
-    username: "semenchkenko",
+    username: "semenchenko",
     password: "password",
-    name: "Семенчкенко Костя",
+    name: "Семенченко Костя",
     role: "student",
     class: "11",
   },
