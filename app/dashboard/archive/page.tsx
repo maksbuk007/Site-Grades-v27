@@ -110,7 +110,7 @@ export default function ArchivePage() {
   }
 
   // Расчет среднего балла по всем предметам за год с точностью до сотых
-  const calculateYearAverageAllSubjects = (yearQuarters: typeof quarters) => {
+  /* const calculateYearAverageAllSubjects = (yearQuarters: typeof quarters) => {
     if (!gradesData) return 0
 
     let allGrades: any[] = []
@@ -131,7 +131,7 @@ export default function ArchivePage() {
           allGrades = [...allGrades, ...subjectData.quarters[quarter.id]]
         }
       })
-    })
+    }) /*/ 
 
     return calculateAverage(allGrades, false)
   }
