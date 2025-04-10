@@ -58,32 +58,6 @@ export default function ArchivePage() {
     return "text-red-500 dark:text-red-400"
   }
 
-  // Расчет среднего балла за год по предмету с точностью до сотых
-  const calculateYearlyAverage = (subjectId: string, yearQuarters: typeof quarters) => {
-    if (!gradesData) return 0
-
-    const subjectData = gradesData.subjects[subjectId]
-    if (!subjectData) return 0
-
-    let allGrades: any[] = []
-
-    yearQuarters.forEach((quarter) => {
-      if (quarter.id === "current") {
-        // Для текущей четверти берем данные из Previous_Grades, если они есть
-        if (subjectData.quarters["2025-Q4"] && subjectData.quarters["2025-Q4"].length > 0) {
-          allGrades = [...allGrades, ...subjectData.quarters["2025-Q4"]]
-        } else {
-          allGrades = [...allGrades, ...subjectData.current]
-        }
-      } else if (subjectData.quarters[quarter.id]) {
-        allGrades = [...allGrades, ...subjectData.quarters[quarter.id]]
-      }
-    })
-
-    // Используем точность до сотых для годовой оценки
-    return calculateAverage(allGrades, false)
-  }
-
   // Расчет среднего балла по четверти для всех предметов с точностью до сотых
   const calculateQuarterAverageAllSubjects = (quarter: string) => {
     if (!gradesData) return 0
@@ -111,47 +85,50 @@ export default function ArchivePage() {
 
   // Расчет среднего балла по всем предметам за год с точностью до сотых
   // верхняя граница 
-   const calculateYearlyAverage = (subjectId: string, yearQuarters: typeof quarters) => {
+   const calculateYearAverageAllSubjects = (yearQuarters: typeof quarters) => {
   if (!gradesData) return 0
 
-  const subjectData = gradesData.subjects[subjectId]
-  if (!subjectData) return 0
+  const allYearlyAverages: number[] = []
 
-  const previousQuarterAverages: number[] = []
+  subjects.forEach((subject) => {
+    const subjectData = gradesData.subjects[subject.id]
+    if (!subjectData) return
 
-  yearQuarters.forEach((quarter) => {
-    if (quarter.id !== "current") {
-      const grades = subjectData.quarters[quarter.id] || []
-      if (grades.length > 0) {
-        previousQuarterAverages.push(calculateAverage(grades, false))
+    const previousQuarterAverages: number[] = []
+
+    yearQuarters.forEach((quarter) => {
+      if (quarter.id !== "current") {
+        const grades = subjectData.quarters[quarter.id] || []
+        if (grades.length > 0) {
+          previousQuarterAverages.push(calculateAverage(grades, false))
+        }
       }
+    })
+
+    let currentQuarterGrades: any[] = []
+    if (subjectData.quarters["2025-Q4"] && subjectData.quarters["2025-Q4"].length > 0) {
+      currentQuarterGrades = subjectData.quarters["2025-Q4"]
+    } else {
+      currentQuarterGrades = subjectData.current
+    }
+
+    const currentQuarterAverage = currentQuarterGrades.length > 0 ? calculateAverage(currentQuarterGrades, false) : 0
+
+    const allQuarterAverages = [...previousQuarterAverages]
+    if (currentQuarterAverage > 0) {
+      allQuarterAverages.push(currentQuarterAverage)
+    }
+
+    if (allQuarterAverages.length > 0) {
+      const subjectYearAverage = allQuarterAverages.reduce((sum, val) => sum + val, 0) / allQuarterAverages.length
+      allYearlyAverages.push(subjectYearAverage)
     }
   })
 
-  // Получаем оценки текущей четверти
-  let currentQuarterGrades: any[] = []
-  if (subjectData.quarters["2025-Q4"] && subjectData.quarters["2025-Q4"].length > 0) {
-    currentQuarterGrades = subjectData.quarters["2025-Q4"]
-  } else {
-    currentQuarterGrades = subjectData.current
-  }
+  if (allYearlyAverages.length === 0) return 0
 
-  const currentQuarterAverage = currentQuarterGrades.length > 0 ? calculateAverage(currentQuarterGrades, false) : 0
-
-  const allQuarterAverages = [...previousQuarterAverages]
-
-  // Добавим среднее текущей четверти, только если оно есть
-  if (currentQuarterAverage > 0) {
-    allQuarterAverages.push(currentQuarterAverage)
-  }
-
-  if (allQuarterAverages.length === 0) return 0
-
-  // Теперь считаем среднее арифметическое из всех четвертных средних
-  const yearlyAverage =
-    allQuarterAverages.reduce((sum, val) => sum + val, 0) / allQuarterAverages.length
-
-  return parseFloat(yearlyAverage.toFixed(2))
+  const totalAverage = allYearlyAverages.reduce((sum, val) => sum + val, 0) / allYearlyAverages.length
+  return parseFloat(totalAverage.toFixed(2))
 }
   // нижняя граница
 
