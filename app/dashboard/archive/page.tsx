@@ -131,10 +131,10 @@ export default function ArchivePage() {
           allGrades = [...allGrades, ...subjectData.quarters[quarter.id]]
         }
       })
-    }) /*/ 
+    }) 
 
     return calculateAverage(allGrades, false)
-  }
+  } /*/ 
 
   // Получение оценок за четверть с учетом 4-й четверти из Previous_Grades
   const getQuarterGrades = (subjectData: any, quarterId: string) => {
