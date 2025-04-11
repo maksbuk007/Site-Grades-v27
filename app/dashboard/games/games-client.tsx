@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCw } from "lucide-react"
-import { Badge } from "@/dashboard/game/touch control"
+import { Badge } from "@/dashboard/game/touch-control"
 
 export function GamesClient() {
   return (
