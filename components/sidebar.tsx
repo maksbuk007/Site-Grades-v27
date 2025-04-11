@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth-provider"
-import { History, Home, ShieldAlert, Users, BookOpen, Settings, Bell } from "lucide-react"
+import { History, Home, ShieldAlert, Users, BookOpen, Settings, Bell, Gamepad } from "lucide-react"
 
 const studentNavItems = [
   {
@@ -21,6 +21,11 @@ const studentNavItems = [
     title: "Архив оценок",
     href: "/dashboard/archive",
     icon: BookOpen,
+  },
+  {
+    title: "Игры",
+    href: "/dashboard/games",
+    icon: Gamepad,
   },
 ]
 
@@ -94,4 +99,3 @@ export function Sidebar() {
     </div>
   )
 }
-

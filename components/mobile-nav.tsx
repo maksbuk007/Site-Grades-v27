@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth-provider"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { Menu, Gamepad } from "lucide-react"
 import { History, Home, ShieldAlert, Users, BookOpen, Settings, Bell } from "lucide-react"
 import { useNotifications } from "@/components/notifications/notification-provider"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +27,11 @@ const studentNavItems = [
     title: "Архив оценок",
     href: "/dashboard/archive",
     icon: BookOpen,
+  },
+  {
+    title: "Игры",
+    href: "/dashboard/games",
+    icon: Gamepad,
   },
 ]
 
@@ -118,4 +123,3 @@ export function MobileNav() {
     </Sheet>
   )
 }
-
