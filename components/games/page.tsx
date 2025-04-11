@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, RotateCw } from "lucide-react"
 
 export default function GamesPage() {
   return (
@@ -385,234 +385,7 @@ function Quiz() {
 
 // Змейка
 function SnakeGame() {
-  const GRID_SIZE = 20
-  const CELL_SIZE = 20
-  const INITIAL_SPEED = 150
-  const SPEED_INCREMENT = 10
-  const MAX_SPEED = 50
-
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [score, setScore] = useState(0)
-  const [gameOver, setGameOver] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-  const [speed, setSpeed] = useState(INITIAL_SPEED)
-  const [highScore, setHighScore] = useState(0)
-
-  // Состояние змейки
-  const [snake, setSnake] = useState([
-    { x: 10, y: 10 },
-    { x: 9, y: 10 },
-    { x: 8, y: 10 },
-  ])
-  const [food, setFood] = useState({ x: 15, y: 10 })
-  const [direction, setDirection] = useState("RIGHT")
-  const [nextDirection, setNextDirection] = useState("RIGHT")
-
-  // Генерация случайной позиции для еды
-  const generateFood = useCallback(() => {
-    const x = Math.floor(Math.random() * GRID_SIZE)
-    const y = Math.floor(Math.random() * GRID_SIZE)
-    return { x, y }
-  }, [])
-
-  // Проверка столкновений
-  const checkCollision = useCallback(
-    (head: { x: number; y: number }) => {
-      // Проверка столкновения со стенами
-      if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
-        return true
-      }
-
-      // Проверка столкновения с самой собой
-      for (let i = 1; i < snake.length; i++) {
-        if (head.x === snake[i].x && head.y === snake[i].y) {
-          return true
-        }
-      }
-
-      return false
-    },
-    [snake],
-  )
-
-  // Обработка нажатий клавиш
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameOver) return
-
-      switch (e.key) {
-        case "ArrowUp":
-          if (direction !== "DOWN") setNextDirection("UP")
-          break
-        case "ArrowDown":
-          if (direction !== "UP") setNextDirection("DOWN")
-          break
-        case "ArrowLeft":
-          if (direction !== "RIGHT") setNextDirection("LEFT")
-          break
-        case "ArrowRight":
-          if (direction !== "LEFT") setNextDirection("RIGHT")
-          break
-        case " ":
-          setIsPaused(!isPaused)
-          break
-        default:
-          break
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [direction, gameOver, isPaused])
-
-  // Игровой цикл
-  useEffect(() => {
-    if (gameOver || isPaused) return
-
-    const moveSnake = () => {
-      setDirection(nextDirection)
-
-      const newSnake = [...snake]
-      const head = { ...newSnake[0] }
-
-      // Перемещение головы в зависимости от направления
-      switch (nextDirection) {
-        case "UP":
-          head.y -= 1
-          break
-        case "DOWN":
-          head.y += 1
-          break
-        case "LEFT":
-          head.x -= 1
-          break
-        case "RIGHT":
-          head.x += 1
-          break
-        default:
-          break
-      }
-
-      // Проверка столкновений
-      if (checkCollision(head)) {
-        setGameOver(true)
-        if (score > highScore) {
-          setHighScore(score)
-        }
-        return
-      }
-
-      // Добавление новой головы
-      newSnake.unshift(head)
-
-      // Проверка, съела ли змейка еду
-      if (head.x === food.x && head.y === food.y) {
-        // Увеличение счета
-        const newScore = score + 1
-        setScore(newScore)
-
-        // Увеличение скорости
-        if (speed > MAX_SPEED) {
-          setSpeed(Math.max(speed - SPEED_INCREMENT, MAX_SPEED))
-        }
-
-        // Генерация новой еды
-        let newFood = generateFood()
-        // Убедимся, что еда не появляется на змейке
-        while (newSnake.some((segment) => segment.x === newFood.x && segment.y === newFood.y)) {
-          newFood = generateFood()
-        }
-        setFood(newFood)
-      } else {
-        // Если еда не съедена, удаляем последний сегмент
-        newSnake.pop()
-      }
-
-      setSnake(newSnake)
-    }
-
-    // Запуск игрового цикла
-    const gameInterval = setInterval(moveSnake, speed)
-    return () => clearInterval(gameInterval)
-  }, [snake, food, direction, nextDirection, gameOver, isPaused, checkCollision, generateFood, score, speed, highScore])
-
-  // Отрисовка игры
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    // Очистка холста
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    // Отрисовка змейки
-    snake.forEach((segment, index) => {
-      ctx.fillStyle = index === 0 ? "#4CAF50" : "#8BC34A"
-      ctx.fillRect(segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-      ctx.strokeStyle = "#388E3C"
-      ctx.strokeRect(segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-    })
-
-    // Отрисовка еды
-    ctx.fillStyle = "#F44336"
-    ctx.beginPath()
-    ctx.arc(food.x * CELL_SIZE + CELL_SIZE / 2, food.y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 2, 0, Math.PI * 2)
-    ctx.fill()
-
-    // Отрисовка сетки (опционально)
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.1)"
-    for (let i = 0; i <= GRID_SIZE; i++) {
-      ctx.beginPath()
-      ctx.moveTo(i * CELL_SIZE, 0)
-      ctx.lineTo(i * CELL_SIZE, GRID_SIZE * CELL_SIZE)
-      ctx.stroke()
-
-      ctx.beginPath()
-      ctx.moveTo(0, i * CELL_SIZE)
-      ctx.lineTo(GRID_SIZE * CELL_SIZE, i * CELL_SIZE)
-      ctx.stroke()
-    }
-  }, [snake, food])
-
-  // Сброс игры
-  const resetGame = () => {
-    setSnake([
-      { x: 10, y: 10 },
-      { x: 9, y: 10 },
-      { x: 8, y: 10 },
-    ])
-    setFood(generateFood())
-    setDirection("RIGHT")
-    setNextDirection("RIGHT")
-    setScore(0)
-    setGameOver(false)
-    setIsPaused(false)
-    setSpeed(INITIAL_SPEED)
-  }
-
-  // Управление с помощью кнопок (для мобильных устройств)
-  const handleDirectionButton = (newDirection: string) => {
-    if (gameOver || isPaused) return
-
-    switch (newDirection) {
-      case "UP":
-        if (direction !== "DOWN") setNextDirection("UP")
-        break
-      case "DOWN":
-        if (direction !== "UP") setNextDirection("DOWN")
-        break
-      case "LEFT":
-        if (direction !== "RIGHT") setNextDirection("LEFT")
-        break
-      case "RIGHT":
-        if (direction !== "LEFT") setNextDirection("RIGHT")
-        break
-      default:
-        break
-    }
-  }
+  const [gameStarted, setGameStarted] = useState(false)
 
   return (
     <Card>
@@ -623,91 +396,95 @@ function SnakeGame() {
           себя.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col items-center">
-          <div className="mb-4 flex items-center gap-4">
-            <Badge variant="outline" className="text-sm">
-              Счет: {score}
-            </Badge>
-            <Badge variant="outline" className="text-sm">
-              Рекорд: {highScore}
-            </Badge>
-            {gameOver && <Badge variant="destructive">Игра окончена!</Badge>}
-            {isPaused && !gameOver && <Badge variant="secondary">Пауза</Badge>}
+      <CardContent className="flex flex-col items-center justify-center">
+        {!gameStarted ? (
+          <div className="text-center">
+            <p className="mb-4">Нажмите кнопку, чтобы начать игру</p>
+            <Button onClick={() => setGameStarted(true)}>Начать игру</Button>
           </div>
-
-          <div className="relative mb-4">
-            <canvas
-              ref={canvasRef}
-              width={GRID_SIZE * CELL_SIZE}
-              height={GRID_SIZE * CELL_SIZE}
-              className="border border-border"
-            />
-            {(gameOver || isPaused) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                <div className="text-center">
-                  <h3 className="text-xl font-bold">{gameOver ? "Игра окончена!" : "Пауза"}</h3>
-                  {gameOver && <p className="mt-2">Ваш счет: {score}</p>}
-                  <Button onClick={gameOver ? resetGame : () => setIsPaused(false)} className="mt-4" variant="default">
-                    {gameOver ? "Начать заново" : "Продолжить"}
-                  </Button>
-                </div>
-              </div>
-            )}
+        ) : (
+          <div className="text-center">
+            <p className="mb-4">Игра загружается...</p>
+            <div className="h-[400px] w-[400px] border border-border flex items-center justify-center">
+              <p>Используйте стрелки для управления змейкой</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              <div></div>
+              <Button variant="outline" className="h-12 w-12">
+                <ArrowUp className="h-6 w-6" />
+              </Button>
+              <div></div>
+              <Button variant="outline" className="h-12 w-12">
+                <ArrowLeft className="h-6 w-6" />
+              </Button>
+              <Button variant="outline" className="h-12 w-12">
+                <RotateCw className="h-6 w-6" />
+              </Button>
+              <Button variant="outline" className="h-12 w-12">
+                <ArrowRight className="h-6 w-6" />
+              </Button>
+              <div></div>
+              <Button variant="outline" className="h-12 w-12">
+                <ArrowDown className="h-6 w-6" />
+              </Button>
+              <div></div>
+            </div>
           </div>
-
-          {/* Кнопки управления для мобильных устройств */}
-          <div className="grid grid-cols-3 gap-2">
-            <div></div>
-            <Button
-              variant="outline"
-              className="h-12 w-12"
-              onClick={() => handleDirectionButton("UP")}
-              disabled={gameOver}
-            >
-              <ArrowUp className="h-6 w-6" />
-            </Button>
-            <div></div>
-            <Button
-              variant="outline"
-              className="h-12 w-12"
-              onClick={() => handleDirectionButton("RIGHT")}
-              disabled={gameOver}
-            >
-              <ArrowRight className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-12 w-12"
-              onClick={() => handleDirectionButton("DOWN")}
-              disabled={gameOver}
-            >
-              <ArrowDown className="h-6 w-6" />
-            </Button>
-            <div></div>
-            <Button
-              variant="outline"
-              className="h-12 w-12"
-              onClick={() => handleDirectionButton("LEFT")}
-              disabled={gameOver}
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </Button>
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <Button onClick={() => setGameStarted(false)} disabled={!gameStarted}>
+          Начать заново
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
 
 // Тетрис
 function BlockBlastGame() {
+  const [gameStarted, setGameStarted] = useState(false)
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Тетрис</CardTitle>
         <CardDescription>Классическая игра-головоломка</CardDescription>
       </CardHeader>
-      <CardContent>
-        <p>Тетрис будет здесь</p>
+      <CardContent className="flex flex-col items-center justify-center">
+        {!gameStarted ? (
+          <div className="text-center">
+            <p className="mb-4">Нажмите кнопку, чтобы начать игру</p>
+            <Button onClick={() => setGameStarted(true)}>Начать игру</Button>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="mb-4">Игра загружается...</p>
+            <div className="h-[500px] w-[300px] border border-border flex items-center justify-center">
+              <p>Используйте стрелки для управления фигурами</p>
+            </div>
+            <div className="flex gap-4 mt-4 justify-center">
+              <Button variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2" /> Влево
+              </Button>
+              <Button variant="outline">
+                <ArrowRight className="h-4 w-4 mr-2" /> Вправо
+              </Button>
+              <Button variant="outline">
+                <ArrowDown className="h-4 w-4 mr-2" /> Вниз
+              </Button>
+              <Button variant="outline">
+                <RotateCw className="h-4 w-4 mr-2" /> Вращать
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex justify-center">
-        <Button>Начать заново</Button>
+        <Button onClick={() => setGameStarted(false)} disabled={!gameStarted}>
+          Начать заново
+        </Button>
       </CardFooter>
     </Card>
   )
-}\
+}
