@@ -15,7 +15,7 @@ import { GradesPieChart } from "@/components/charts/grades-pie-chart"
 import { SubjectsComparisonChart } from "@/components/charts/subjects-comparison-chart"
 import { ExtendedStatistics } from "@/components/statistics/extended-statistics"
 import { useNotifications } from "@/components/notifications/notification-provider"
-import { DiscussionEmbed } from 'disqus-react'
+import { DiscussionEmbed } from "disqus-react"
 
 export default function Dashboard() {
   const { user } = useAuth()
