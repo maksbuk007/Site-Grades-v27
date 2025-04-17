@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npm install --save disqus-react"
+    "postinstall": "pnpm install --save disqus-react"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
