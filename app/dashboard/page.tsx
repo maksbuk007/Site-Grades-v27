@@ -240,7 +240,7 @@ export default function Dashboard() {
           />
         </TabsContent>
       </Tabs>
-                  <DisqusComments 
+      <DisqusComments 
         identifier={user?.id || 'default-id'} 
         title="Обсуждение успеваемости" 
       />
