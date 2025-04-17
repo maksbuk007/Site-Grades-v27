@@ -240,16 +240,9 @@ export default function Dashboard() {
           />
         </TabsContent>
       </Tabs>
-            <DiscussionEmbed
-          shortname='site-grades'
-          config={
-              {
-                  url: this.props.article.url,
-                  identifier: this.props.article.id,
-                  title: this.props.article.title,
-                  language: 'zh_TW' //e.g. for Traditional Chinese (Taiwan)
-              }
-          }
+                  <DisqusComments 
+        identifier={user?.id || 'default-id'} 
+        title="Обсуждение успеваемости" 
       />
     </div>
   )
