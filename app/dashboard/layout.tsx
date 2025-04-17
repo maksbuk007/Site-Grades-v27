@@ -1,7 +1,7 @@
 import type React from "react"
 import { Navbar } from "@/components/navbar"
 import { Sidebar } from "@/components/sidebar"
-import { DisqusCount } from "@/components/disqus-count" // Импортируем компонент
+import { DisqusCount } from "@/dashboard/disqus-count" // Импортируем компонент
 
 export default function DashboardLayout({
   children,
