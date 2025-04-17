@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] })
 export const metadata: Metadata = {
   title: "Школьный портал оценок",
   description: "Портал для просмотра оценок школьников",
-    generator: 'v0.dev'
+    generator: 'maksbuk community'
 }
 
 export default function RootLayout({
