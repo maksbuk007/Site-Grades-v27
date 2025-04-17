@@ -15,6 +15,7 @@ import { GradesPieChart } from "@/components/charts/grades-pie-chart"
 import { SubjectsComparisonChart } from "@/components/charts/subjects-comparison-chart"
 import { ExtendedStatistics } from "@/components/statistics/extended-statistics"
 import { useNotifications } from "@/components/notifications/notification-provider"
+import { DiscussionEmbed } from 'disqus-react'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -63,7 +64,7 @@ export default function Dashboard() {
           // Показываем уведомления только один раз при первой загрузке
           if (!notificationsShown) {
             // Добавляем тестовое уведомление при загрузке данных
-            addNotification({
+           /* addNotification({
               title: "Данные обновлены",
               message: `Данные успеваемости обновлены: ${result.lastUpdate || new Date().toLocaleString()}`,
               type: "info",
@@ -74,7 +75,7 @@ export default function Dashboard() {
               title: "Предстоящая контрольная",
               message: "Контрольная работа по математике через 3 дня",
               type: "warning",
-            })
+            }) */
 
             // Устанавливаем флаг, что уведомления были показаны
             localStorage.setItem("notificationsShown", "true")
@@ -239,6 +240,17 @@ export default function Dashboard() {
           />
         </TabsContent>
       </Tabs>
+            <DiscussionEmbed
+          shortname='site-grades'
+          config={
+              {
+                  url: this.props.article.url,
+                  identifier: this.props.article.id,
+                  title: this.props.article.title,
+                  language: 'zh_TW' //e.g. for Traditional Chinese (Taiwan)
+              }
+          }
+      />
     </div>
   )
 }
