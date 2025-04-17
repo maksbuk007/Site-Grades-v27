@@ -31,7 +31,7 @@ export default function Dashboard() {
     // Флаг для отслеживания, были ли уже показаны уведомления
     const notificationsShown = localStorage.getItem("notificationsShown")
 
-    // Обновим функцию loadData
+    // Обновим функцию loadData /
     const loadData = async () => {
       if (user) {
         try {
