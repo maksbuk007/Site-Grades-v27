@@ -82,6 +82,12 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+   #disqus_thread {
+    background-color: #000000;  /* Чёрный цвет */
+    padding: 20px;
+    border-radius: 8px;
+    color: #ffffff; /* Белый текст для контраста */
+  }
 }
 
 @layer base {
