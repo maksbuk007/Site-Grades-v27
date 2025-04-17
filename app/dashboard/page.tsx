@@ -16,6 +16,7 @@ import { SubjectsComparisonChart } from "@/components/charts/subjects-comparison
 import { ExtendedStatistics } from "@/components/statistics/extended-statistics"
 import { useNotifications } from "@/components/notifications/notification-provider"
 import { DiscussionEmbed } from 'disqus-react'
+import { DisqusComments } from "@/components/disqus-comments"
 
 export default function Dashboard() {
   const { user } = useAuth()
