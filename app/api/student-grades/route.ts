@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
               "2025-Q2": [],
               "2025-Q3": [],
             },
+            archiveGrades: [], // Добавляем массив для архивных оценок
           }
         })
 
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest) {
             "2025-Q2": [],
             "2025-Q3": [],
           },
+          archiveGrades: [], // Добавляем массив для архивных оценок
         }
       })
 
@@ -107,4 +109,3 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-
