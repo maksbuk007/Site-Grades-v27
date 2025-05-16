@@ -29,11 +29,8 @@ export default function Dashboard() {
   const [debug, setDebug] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("grades")
 
-  useEffect(() => {
-    // Флаг для отслеживания, были ли уже показаны уведомления
-    const notificationsShown = localStorage.getItem("notificationsShown")
-
-    // Обновим функцию loadData /
+useEffect(() => {
+    // Обновим функцию loadData
     const loadData = async () => {
       if (user) {
         try {
@@ -43,13 +40,16 @@ export default function Dashboard() {
 
           console.log("Загрузка данных для пользователя:", user.id, user.name)
           const result = await getStudentData(user.id)
+          console.log("Результат запроса оценок студента:", result)
 
           // Проверяем, есть ли данные
           let hasAnyGrades = false
           const debugInfo = []
 
           for (const subjectId in result.data.subjects) {
+            // Проверяем только текущие оценки, игнорируя архивные
             const current = result.data.subjects[subjectId].current || []
+            // Убедимся, что мы не используем оценки из quarters["2025-Q4"]
             if (current.length > 0) {
               hasAnyGrades = true
               debugInfo.push(`${subjectId}: ${current.length} оценок`)
@@ -57,34 +57,14 @@ export default function Dashboard() {
           }
 
           if (!hasAnyGrades) {
-            setDebug(`Данные загружены, но оценок не найдено. Проверьте структуру данных: ${JSON.stringify(debugInfo)}`)
+            setDebug(`Данные загружены, но оценок не найдено. Проверьте структуру данных в Google Sheets.`)
           }
 
           setGradesData(result.data)
           setLastUpdate(result.lastUpdate || "")
-
-          // Показываем уведомления только один раз при первой загрузке
-          if (!notificationsShown) {
-            // Добавляем тестовое уведомление при загрузке данных
-           /* addNotification({
-              title: "Данные обновлены",
-              message: `Данные успеваемости обновлены: ${result.lastUpdate || new Date().toLocaleString()}`,
-              type: "info",
-            })
-
-            // Добавляем тестовое уведомление о предстоящей контрольной
-            addNotification({
-              title: "Предстоящая контрольная",
-              message: "Контрольная работа по математике через 3 дня",
-              type: "warning",
-            }) */
-
-            // Устанавливаем флаг, что уведомления были показаны
-            localStorage.setItem("notificationsShown", "true")
-          }
         } catch (err) {
           console.error("Ошибка при загрузке данных:", err)
-          setError("Не удалось загрузить данные оценок. Пожалуйста, попробуйте позже.")
+          setError("Не удалось загрузить данные оценок. Пожалуйста, проверьте подключение к Google Sheets.")
         } finally {
           setLoading(false)
         }
@@ -169,6 +149,7 @@ export default function Dashboard() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {subjects.map((subject) => {
                   const subjectData = gradesData?.subjects[subject.id]
+                  // Используем только текущие оценки, игнорируя архивные
                   const currentGrades = subjectData?.current || []
                   const average = calculateAverage(currentGrades)
 
