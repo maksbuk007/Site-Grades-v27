@@ -206,6 +206,7 @@ export async function getAllGradesFromSheets(): Promise<{
               "2025-Q2": [],
               "2025-Q3": [],
             },
+            archiveGrades: [], // Добавляем массив для архивных оценок
           }
         }
       })
@@ -308,14 +309,20 @@ export async function getAllGradesFromSheets(): Promise<{
             .map((g) => g.trim())
             .filter((g) => g !== "")
 
-          // Теперь каждая оценка соответствует определенной четверти
-          // Первая оценка - 1 четверть, вторая - 2 четверть, третья - 3 четверть, четвертая - 4 четверть
-          const quarters = ["2025-Q1", "2025-Q2", "2025-Q3", "current"]
+          // Сохраняем архивные оценки как есть
+          studentGrades.subjects[subject.id].archiveGrades = gradesArray.map((g) => {
+            const value = Number.parseInt(g, 10)
+            return isNaN(value) ? 0 : value
+          })
+
+          // Первые 4 оценки соответствуют четвертям, 5-я - годовая
+          // Распределяем оценки по четвертям
+          const quarterIds = ["2025-Q1", "2025-Q2", "2025-Q3", "current"]
 
           gradesArray.forEach((gradeStr, qIndex) => {
-            if (qIndex >= quarters.length) return // Пропускаем, если больше 4 оценок
+            if (qIndex >= 4) return // Обрабатываем только первые 4 оценки (четверти)
 
-            const quarter = quarters[qIndex]
+            const quarterId = quarterIds[qIndex]
             const value = Number.parseInt(gradeStr, 10)
 
             if (!isNaN(value) && value > 0) {
@@ -327,10 +334,10 @@ export async function getAllGradesFromSheets(): Promise<{
                 current: new Date(2025, 4, 15), // 15 мая 2025
               }
 
-              const date = quarterDates[quarter as keyof typeof quarterDates]
+              const date = quarterDates[quarterId as keyof typeof quarterDates]
 
               // Добавляем оценку в соответствующую четверть
-              if (quarter === "current") {
+              if (quarterId === "current") {
                 studentGrades.subjects[subject.id].current = [
                   {
                     value: value,
@@ -338,7 +345,7 @@ export async function getAllGradesFromSheets(): Promise<{
                   },
                 ]
               } else {
-                studentGrades.subjects[subject.id].quarters[quarter] = [
+                studentGrades.subjects[subject.id].quarters[quarterId] = [
                   {
                     value: value,
                     date: date.toISOString(),
@@ -347,7 +354,7 @@ export async function getAllGradesFromSheets(): Promise<{
               }
 
               console.log(
-                `Для ученика ${student.name} по предмету ${subject.name} за четверть ${quarter} найдена оценка ${value}`,
+                `Для ученика ${student.name} по предмету ${subject.name} за четверть ${quarterId} найдена оценка ${value}`,
               )
             }
           })
@@ -386,6 +393,7 @@ export async function getStudentGradesFromSheets(studentId: string): Promise<{
             "2025-Q2": [],
             "2025-Q3": [],
           },
+          archiveGrades: [], // Добавляем массив для архивных оценок
         }
       })
 
@@ -1256,4 +1264,3 @@ export async function getClassPerformanceData() {
     throw error
   }
 }
-
