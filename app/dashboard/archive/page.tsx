@@ -1,3 +1,4 @@
+"use client"
  import { useEffect, useState } from "react"
  import { useAuth } from "@/lib/auth-provider"
  import { getStudentData, subjects, calculateAverage, quarters } from "@/lib/data"
